@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siddharth Desai — ECE Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=Azeret+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #040a04;
+            --bg-section: #060e06;
+            --bg-card: rgba(10, 28, 10, 0.7);
+            --pcb-green: #0d2b0d;
+            --pcb-green-light: #1a4a1a;
+            --copper: #c87533;
+            --copper-light: #d4a574;
+            --copper-glow: rgba(200, 117, 51, 0.25);
+            --gold: #e8c170;
+            --solder: #8a9a9a;
+            --text-primary: #e0ddd4;
+            --text-secondary: #7a8a7a;
+            --text-accent: #d4a574;
+            --font-display: 'Chakra Petch', sans-serif;
+            --font-mono: 'Azeret Mono', monospace;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: var(--copper) var(--bg-primary);
+        }
+
+        body {
+            font-family: var(--font-mono);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            font-size: 14px;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--copper); border-radius: 3px; }
+
+        /* ── NAVIGATION ── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 0 2rem;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(4, 10, 4, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(200, 117, 51, 0.08);
+            transition: background 0.4s, border-color 0.4s;
+        }
+
+        nav.scrolled {
+            background: rgba(4, 10, 4, 0.92);
+            border-bottom-color: rgba(200, 117, 51, 0.2);
+        }
+
+        .nav-logo {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: var(--copper);
+            letter-spacing: 2px;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--copper);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--copper-light);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .nav-toggle span {
+            width: 22px;
+            height: 1.5px;
+            background: var(--copper);
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        /* ── HERO ── */
+        #hero {
+            position: relative;
+            height: 100vh;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #pcb-canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 30%, rgba(4, 10, 4, 0.6) 70%, rgba(4, 10, 4, 0.95) 100%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            opacity: 0;
+            animation: heroReveal 1.6s ease 0.6s forwards;
+        }
+
+        .hero-tag {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--copper);
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-bottom: 1.2rem;
+            opacity: 0;
+            animation: fadeUp 1s ease 0.9s forwards;
+        }
+
+        .hero-name {
+            font-family: var(--font-display);
+            font-size: clamp(2.8rem, 8vw, 6.5rem);
+            font-weight: 700;
+            line-height: 0.95;
+            letter-spacing: -1px;
+            color: var(--text-primary);
+            margin-bottom: 0.6rem;
+            text-shadow: 0 0 60px rgba(200, 117, 51, 0.15);
+        }
+
+        .hero-name .accent {
+            color: var(--copper);
+        }
+
+        .hero-separator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 1.5rem auto;
+            width: 280px;
+            opacity: 0;
+            animation: fadeUp 1s ease 1.1s forwards;
+        }
+
+        .hero-separator .line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--copper), transparent);
+        }
+
+        .hero-separator .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--copper);
+            box-shadow: 0 0 8px var(--copper-glow);
+        }
+
+        .hero-subtitle {
+            font-family: var(--font-display);
+            font-size: clamp(0.9rem, 2vw, 1.15rem);
+            font-weight: 300;
+            color: var(--text-secondary);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: fadeUp 1s ease 1.3s forwards;
+        }
+
+        .hero-uni {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 0.8rem;
+            opacity: 0;
+            animation: fadeUp 1s ease 1.5s forwards;
+        }
+
+        .scroll-cue {
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            animation: fadeUp 1s ease 2s forwards;
+        }
+
+        .scroll-cue span {
+            font-size: 0.55rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .scroll-cue .scroll-line {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--copper), transparent);
+            animation: scrollPulse 2.5s ease infinite;
+        }
+
+        /* ── SECTIONS ── */
+        .section {
+            position: relative;
+            padding: 7rem 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            color: var(--copper);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 0.6rem;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 3rem;
+            line-height: 1.1;
+        }
+
+        .section-divider {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            height: 1px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--copper) 0px, var(--copper) 24px,
+                transparent 24px, transparent 32px,
+                var(--copper) 32px, var(--copper) 36px,
+                transparent 36px, transparent 44px
+            );
+            opacity: 0.25;
+        }
+
+        /* ── ABOUT ── */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .about-badge {
+            background: var(--bg-card);
+            border: 1px solid rgba(200, 117, 51, 0.15);
+            border-radius: 2px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .about-badge .chip-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.2rem;
+            border: 2px solid var(--copper);
+            border-radius: 4px;
+            display: grid;
+            place-items: center;
+            position: relative;
+        }
+
+        .about-badge .chip-icon::before,
+        .about-badge .chip-icon::after {
+            content: '';
+            position: absolute;
+            background: var(--copper);
+        }
+
+        .about-badge .chip-icon::before {
+            width: 120%;
+            height: 1px;
+            top: 25%;
+        }
+
+        .about-badge .chip-icon::after {
+            width: 1px;
+            height: 120%;
+            left: 25%;
+        }
+
+        .about-badge .chip-label {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.3rem;
+        }
+
+        .about-badge .chip-sub {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .about-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat {
+            padding: 0.8rem;
+            border: 1px solid rgba(200, 117, 51, 0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--copper);
+        }
+
+        .stat-label {
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .about-text p {
+            margin-bottom: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .about-text p:first-child {
+            font-size: 1.05rem;
+            color: var(--text-primary);
+            font-weight: 400;
+        }
+
+        /* ── SKILLS ── */
+        .skills-bus {
+            position: relative;
+            padding-top: 30px;
+        }
+
+        .skills-bus::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 2px;
+            background: var(--copper);
+            opacity: 0.3;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .skill-card {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid rgba(200, 117, 51, 0.12);
+            padding: 2.2rem 1.5rem 1.5rem;
+            transition: border-color 0.4s, box-shadow 0.4s, transform 0.3s;
+        }
+
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--bg-primary);
+            border: 2px solid var(--copper);
+            box-shadow: 0 0 6px var(--copper-glow);
+            transition: background 0.3s, box-shadow 0.3s;
+            z-index: 2;
+        }
+
+        .skill-card::after {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 12px;
+            background: var(--copper);
+            opacity: 0.4;
+        }
+
+        .skill-card:hover {
+            border-color: rgba(200, 117, 51, 0.4);
+            box-shadow: 0 0 30px rgba(200, 117, 51, 0.08), inset 0 0 30px rgba(200, 117, 51, 0.03);
+            transform: translateY(-4px);
+        }
+
+        .skill-card:hover::before {
+            background: var(--copper);
+            box-shadow: 0 0 14px rgba(200, 117, 51, 0.5);
+        }
+
+        .skill-card-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--copper-light);
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+        }
+
+        .skill-card ul {
+            list-style: none;
+        }
+
+        .skill-card li {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            padding: 0.3rem 0;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+
+        .skill-card li::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            color: var(--copper);
+            font-weight: 600;
+        }
+
+        /* ── PROJECTS ── */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .project-card {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid rgba(200, 117, 51, 0.1);
+            padding: 2rem;
+            overflow: hidden;
+            transition: border-color 0.4s, box-shadow 0.4s, transform 0.3s;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--copper), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .project-card:hover {
+            border-color: rgba(200, 117, 51, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(200, 117, 51, 0.06);
+            transform: translateY(-3px);
+        }
+
+        .project-card:hover::before {
+            opacity: 1;
+        }
+
+        .project-index {
+            font-family: var(--font-display);
+            font-size: 0.65rem;
+            color: var(--copper);
+            letter-spacing: 3px;
+            margin-bottom: 0.8rem;
+        }
+
+        .project-title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.6rem;
+            line-height: 1.3;
+        }
+
+        .project-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.2rem;
+            line-height: 1.6;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .project-tags span {
+            font-size: 0.6rem;
+            padding: 3px 10px;
+            border: 1px solid rgba(200, 117, 51, 0.2);
+            color: var(--copper-light);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* ── LEADERSHIP ── */
+        .timeline {
+            position: relative;
+            padding-left: 3rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--copper), rgba(200, 117, 51, 0.1));
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2.5rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -3rem;
+            top: 6px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--bg-primary);
+            border: 2px solid var(--copper);
+            box-shadow: 0 0 10px var(--copper-glow);
+            margin-left: -1px;
+        }
+
+        .timeline-year {
+            font-family: var(--font-display);
+            font-size: 0.7rem;
+            color: var(--copper);
+            letter-spacing: 3px;
+            font-weight: 600;
+        }
+
+        .timeline-role {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin: 0.3rem 0 0.2rem;
+        }
+
+        .timeline-org {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* ── CONTACT ── */
+        .contact-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            border: 1px solid rgba(200, 117, 51, 0.12);
+            background: var(--bg-card);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .contact-item:hover {
+            border-color: rgba(200, 117, 51, 0.35);
+            box-shadow: 0 0 20px rgba(200, 117, 51, 0.06);
+        }
+
+        .contact-icon {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--copper);
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+
+        .contact-icon svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--copper);
+            fill: none;
+            stroke-width: 1.5;
+        }
+
+        .contact-label {
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .contact-value {
+            font-family: var(--font-display);
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            margin-top: 2px;
+        }
+
+        .contact-value a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .contact-value a:hover {
+            color: var(--copper-light);
+        }
+
+        .contact-cta {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 3rem 2rem;
+            border: 1px solid rgba(200, 117, 51, 0.15);
+            background: var(--bg-card);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-cta::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: conic-gradient(
+                from 0deg,
+                transparent 0%,
+                var(--copper) 10%,
+                transparent 20%,
+                transparent 100%
+            );
+            opacity: 0.2;
+            animation: borderSpin 8s linear infinite;
+            z-index: 0;
+        }
+
+        .contact-cta::after {
+            content: '';
+            position: absolute;
+            inset: 1px;
+            background: var(--bg-card);
+            z-index: 1;
+        }
+
+        .contact-cta > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .contact-cta h3 {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.8rem;
+        }
+
+        .contact-cta p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            max-width: 300px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--bg-primary);
+            background: var(--copper);
+            padding: 0.8rem 2.5rem;
+            text-decoration: none;
+            transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+        }
+
+        .cta-btn:hover {
+            background: var(--copper-light);
+            box-shadow: 0 0 24px rgba(200, 117, 51, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            text-align: center;
+            padding: 2.5rem 2rem;
+            border-top: 1px solid rgba(200, 117, 51, 0.08);
+        }
+
+        footer p {
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        footer .copper { color: var(--copper); }
+
+        /* ── ANIMATIONS ── */
+        @keyframes heroReveal {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0; transform: scaleY(0); transform-origin: top; }
+            30% { opacity: 1; transform: scaleY(1); }
+            70% { opacity: 1; transform: scaleY(1); }
+            100% { opacity: 0; transform: scaleY(0); transform-origin: bottom; }
+        }
+
+        @keyframes borderSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+        .reveal-delay-5 { transition-delay: 0.5s; }
+        .reveal-delay-6 { transition-delay: 0.6s; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .nav-links { display: none; }
+            .nav-links.open {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 56px;
+                left: 0;
+                right: 0;
+                background: rgba(4, 10, 4, 0.96);
+                padding: 1.5rem 2rem;
+                gap: 1.2rem;
+                border-bottom: 1px solid rgba(200, 117, 51, 0.15);
+            }
+            .nav-toggle { display: flex; }
+            .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .skills-grid { grid-template-columns: repeat(2, 1fr); }
+            .projects-grid { grid-template-columns: 1fr; }
+            .contact-wrapper { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 600px) {
+            .section { padding: 4.5rem 1.2rem; }
+            .skills-grid { grid-template-columns: 1fr; }
+            .hero-name { letter-spacing: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION -->
+    <nav id="mainNav">
+        <a href="#hero" class="nav-logo">S/D</a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#about">About</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#leadership">Leadership</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="nav-toggle" id="navToggle" onclick="document.getElementById('navLinks').classList.toggle('open')">
+            <span></span><span></span><span></span>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section id="hero">
+        <canvas id="pcb-canvas"></canvas>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-tag">Electronics &amp; Communication</div>
+            <h1 class="hero-name">SIDDHARTH<br><span class="accent">DESAI</span></h1>
+            <div class="hero-separator"><span class="line"></span><span class="dot"></span><span class="line"></span></div>
+            <p class="hero-subtitle">Hardware Engineer</p>
+            <p class="hero-uni">B.Tech ECE &mdash; Nirma University, Ahmedabad</p>
+        </div>
+        <div class="scroll-cue">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ABOUT -->
+    <section id="about" class="section">
+        <div class="about-grid">
+            <div class="about-badge reveal">
+                <div class="chip-icon">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.2" style="color:var(--copper)">
+                        <rect x="8" y="8" width="16" height="16" rx="1"/>
+                        <circle cx="16" cy="16" r="3"/>
+                        <line x1="4" y1="12" x2="8" y2="12"/><line x1="4" y1="16" x2="8" y2="16"/><line x1="4" y1="20" x2="8" y2="20"/>
+                        <line x1="24" y1="12" x2="28" y2="12"/><line x1="24" y1="16" x2="28" y2="16"/><line x1="24" y1="20" x2="28" y2="20"/>
+                        <line x1="12" y1="4" x2="12" y2="8"/><line x1="16" y1="4" x2="16" y2="8"/><line x1="20" y1="4" x2="20" y2="8"/>
+                        <line x1="12" y1="24" x2="12" y2="28"/><line x1="16" y1="24" x2="16" y2="28"/><line x1="20" y1="24" x2="20" y2="28"/>
+                    </svg>
+                </div>
+                <div class="chip-label">Siddharth Desai</div>
+                <div class="chip-sub">ECE &bull; 2023&ndash;2027</div>
+                <div class="about-stats">
+                    <div class="stat"><div class="stat-value">7.77</div><div class="stat-label">CGPA</div></div>
+                    <div class="stat"><div class="stat-value">6</div><div class="stat-label">Projects</div></div>
+                    <div class="stat"><div class="stat-value">6</div><div class="stat-label">Skill Areas</div></div>
+                    <div class="stat"><div class="stat-value">3+</div><div class="stat-label">Leadership</div></div>
+                </div>
+            </div>
+            <div class="about-text reveal reveal-delay-2">
+                <div class="section-label">// About</div>
+                <h2 class="section-title">Designing at the<br>Transistor Level</h2>
+                <p>Electronics &amp; Communication Engineering student at the Institute of Technology, Nirma University, with a deep passion for VLSI design, embedded systems, and digital circuits.</p>
+                <p>Experienced in physical design workflows&mdash;from floorplanning through placement &amp; routing to sign-off. Proficient in CMOS layout using industry tools like Microwind and Magic, with hands-on FPGA development using Verilog, ModelSim, and Vivado.</p>
+                <p>I turn complex circuit architectures into working silicon-level implementations, bridging the gap between theoretical design and physical realization.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- SKILLS -->
+    <section id="skills" class="section">
+        <div class="section-label reveal">// Skill Matrix</div>
+        <h2 class="section-title reveal reveal-delay-1">Core Competencies</h2>
+        <div class="skills-bus">
+            <div class="skills-grid">
+                <div class="skill-card reveal reveal-delay-1">
+                    <div class="skill-card-title">Physical Design</div>
+                    <ul>
+                        <li>Floorplanning</li>
+                        <li>Placement &amp; Routing</li>
+                        <li>Timing Diagrams</li>
+                        <li>Static Timing Analysis</li>
+                    </ul>
+                </div>
+                <div class="skill-card reveal reveal-delay-2">
+                    <div class="skill-card-title">CMOS Layout</div>
+                    <ul>
+                        <li>Microwind</li>
+                        <li>Magic VLSI</li>
+                        <li>Inverter / Flip-Flop Layout</li>
+                        <li>Counter Layout Design</li>
+                    </ul>
+                </div>
+                <div class="skill-card reveal reveal-delay-3">
+                    <div class="skill-card-title">Digital Design</div>
+                    <ul>
+                        <li>FSMs &amp; Counters</li>
+                        <li>UART Protocol</li>
+                        <li>Clocking &amp; Metastability</li>
+                        <li>Synthesis &amp; Verification</li>
+                    </ul>
+                </div>
+                <div class="skill-card reveal reveal-delay-4">
+                    <div class="skill-card-title">FPGA / HDL</div>
+                    <ul>
+                        <li>Verilog HDL</li>
+                        <li>ModelSim Simulation</li>
+                        <li>Vivado Toolchain</li>
+                        <li>On-Board Debugging</li>
+                    </ul>
+                </div>
+                <div class="skill-card reveal reveal-delay-5">
+                    <div class="skill-card-title">Analog Circuits</div>
+                    <ul>
+                        <li>Op-Amp Testing</li>
+                        <li>Precision Rectifiers</li>
+                        <li>Slew Rate Measurement</li>
+                        <li>Signal Conditioning</li>
+                    </ul>
+                </div>
+                <div class="skill-card reveal reveal-delay-6">
+                    <div class="skill-card-title">Marketing</div>
+                    <ul>
+                        <li>Consumer Behaviour</li>
+                        <li>Digital Marketing</li>
+                        <li>Data Analytics</li>
+                        <li>Market Research</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- PROJECTS -->
+    <section id="projects" class="section">
+        <div class="section-label reveal">// Project Log</div>
+        <h2 class="section-title reveal reveal-delay-1">Selected Works</h2>
+        <div class="projects-grid">
+            <div class="project-card reveal reveal-delay-1">
+                <div class="project-index">PRJ_01</div>
+                <div class="project-title">Precision Rectifier Using Op-Amp</div>
+                <div class="project-desc">Designed and tested precision half-wave and full-wave rectifier circuits using op-amps on breadboard, achieving accurate rectification below the diode threshold voltage.</div>
+                <div class="project-tags"><span>Analog</span><span>Op-Amp</span><span>Breadboard</span></div>
+            </div>
+            <div class="project-card reveal reveal-delay-2">
+                <div class="project-index">PRJ_02</div>
+                <div class="project-title">Water Tank Level Indicator</div>
+                <div class="project-desc">Developed a water level detection system using basic electronic components for real-time monitoring and visual indication of water levels.</div>
+                <div class="project-tags"><span>Sensors</span><span>Embedded</span></div>
+            </div>
+            <div class="project-card reveal reveal-delay-3">
+                <div class="project-index">PRJ_03</div>
+                <div class="project-title">UART Transmitter &amp; Receiver on FPGA</div>
+                <div class="project-desc">Implemented full UART communication protocol in Verilog, synthesized and verified on FPGA board with configurable baud rate and data width.</div>
+                <div class="project-tags"><span>Verilog</span><span>FPGA</span><span>UART</span></div>
+            </div>
+            <div class="project-card reveal reveal-delay-4">
+                <div class="project-index">PRJ_04</div>
+                <div class="project-title">Bluetooth RGB Lighting &amp; Auto Light Detection</div>
+                <div class="project-desc">8051 microcontroller-based IoT project combining Bluetooth-controlled RGB LED lighting with an ambient light sensor for automatic brightness adjustment.</div>
+                <div class="project-tags"><span>8051</span><span>Bluetooth</span><span>IoT</span></div>
+            </div>
+            <div class="project-card reveal reveal-delay-5">
+                <div class="project-index">PRJ_05</div>
+                <div class="project-title">CMOS Layout: 2-Bit Up/Down Counter</div>
+                <div class="project-desc">Full CMOS transistor-level layout design of a 2-bit bidirectional counter in Microwind, verified with DRC and timing simulation.</div>
+                <div class="project-tags"><span>CMOS</span><span>Microwind</span><span>Layout</span></div>
+            </div>
+            <div class="project-card reveal reveal-delay-6">
+                <div class="project-index">PRJ_06</div>
+                <div class="project-title">CMOS Temperature Sensor (Ring Oscillator)</div>
+                <div class="project-desc">Temperature sensing system exploiting the thermal dependency of ring oscillator frequency in CMOS process, providing digital temperature readout.</div>
+                <div class="project-tags"><span>CMOS</span><span>Sensor</span><span>Oscillator</span></div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- LEADERSHIP -->
+    <section id="leadership" class="section">
+        <div class="section-label reveal">// Leadership</div>
+        <h2 class="section-title reveal reveal-delay-1">Extracurriculars</h2>
+        <div class="timeline">
+            <div class="timeline-item reveal reveal-delay-1">
+                <div class="timeline-year">2025</div>
+                <div class="timeline-role">Core Committee Member</div>
+                <div class="timeline-org">Vaudeville 2025 &mdash; Nirma University's Annual Cultural Festival</div>
+            </div>
+            <div class="timeline-item reveal reveal-delay-2">
+                <div class="timeline-year">2024&ndash;2025</div>
+                <div class="timeline-role">Core Committee Member</div>
+                <div class="timeline-org">Kala Carnival &amp; Nuzeal &mdash; Inter-college Arts &amp; Freshers' Events</div>
+            </div>
+            <div class="timeline-item reveal reveal-delay-3">
+                <div class="timeline-year">2024</div>
+                <div class="timeline-role">Executive Committee Member</div>
+                <div class="timeline-org">Vaudeville 2024 &mdash; Nirma University's Annual Cultural Festival</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section">
+        <div class="section-label reveal">// Connect</div>
+        <h2 class="section-title reveal reveal-delay-1">Get in Touch</h2>
+        <div class="contact-wrapper">
+            <div class="contact-info reveal reveal-delay-2">
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+                    </div>
+                    <div>
+                        <div class="contact-label">Email</div>
+                        <div class="contact-value"><a href="mailto:siddesai10032005@gmail.com">siddesai10032005@gmail.com</a></div>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                    </div>
+                    <div>
+                        <div class="contact-label">Phone</div>
+                        <div class="contact-value"><a href="tel:+919824325333">+91 98243 25333</a></div>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <div>
+                        <div class="contact-label">Location</div>
+                        <div class="contact-value">Ahmedabad, India</div>
+                    </div>
+                </div>
+            </div>
+            <div class="contact-cta reveal reveal-delay-3">
+                <h3>Let's Build Something</h3>
+                <p>Open to internships, research collaborations, and hardware engineering opportunities.</p>
+                <a href="mailto:siddesai10032005@gmail.com" class="cta-btn">Say Hello</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2025 <span class="copper">Siddharth Desai</span> &mdash; Designed with circuits in mind</p>
+    </footer>
+
+    <!-- THREE.JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+    (function() {
+        /* ── PCB TEXTURE ── */
+        function createPCBTexture() {
+            const W = 2000, H = 1400;
+            const c = document.createElement('canvas');
+            c.width = W; c.height = H;
+            const ctx = c.getContext('2d');
+            const S = 200; // scale: 200px per board unit
+
+            // Board coords to canvas coords
+            function bx(x) { return W/2 + x * S; }
+            function by(y) { return H/2 - y * S; }
+
+            // Solder mask base
+            ctx.fillStyle = '#0a3d0a';
+            ctx.fillRect(0, 0, W, H);
+
+            // Ground plane cross-hatch fill
+            ctx.strokeStyle = 'rgba(18, 60, 18, 0.35)';
+            ctx.lineWidth = 0.5;
+            for (let i = -3000; i < 3000; i += 14) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i + H, H);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(i + H, 0);
+                ctx.lineTo(i, H);
+                ctx.stroke();
+            }
+
+            // Manufacturing grid
+            ctx.strokeStyle = 'rgba(20, 70, 20, 0.15)';
+            ctx.lineWidth = 0.3;
+            for (let x = 0; x < W; x += 20) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+            for (let y = 0; y < H; y += 20) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+            // ── Trace routes ──
+            const copper = '#b06a2e';
+            const copperBright = '#c87e3c';
+
+            function drawTrace(pts, w) {
+                ctx.strokeStyle = copperBright;
+                ctx.lineWidth = w;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.beginPath();
+                ctx.moveTo(bx(pts[0][0]), by(pts[0][1]));
+                for (let i = 1; i < pts.length; i++) ctx.lineTo(bx(pts[i][0]), by(pts[i][1]));
+                ctx.stroke();
+            }
+
+            function drawPad(x, y, r, square) {
+                ctx.fillStyle = '#c89548';
+                if (square) {
+                    ctx.fillRect(bx(x) - r, by(y) - r, r * 2, r * 2);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(bx(x), by(y), r, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            function drawSMDPads(x, y, pw, ph, gap) {
+                ctx.fillStyle = '#c89548';
+                ctx.fillRect(bx(x) - pw - gap/2, by(y) - ph/2, pw, ph);
+                ctx.fillRect(bx(x) + gap/2, by(y) - ph/2, pw, ph);
+            }
+
+            function drawVia(x, y) {
+                ctx.fillStyle = '#c89548';
+                ctx.beginPath();
+                ctx.arc(bx(x), by(y), 7, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#1a1a1a';
+                ctx.beginPath();
+                ctx.arc(bx(x), by(y), 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            function drawICOutline(cx, cy, w, h, label) {
+                const px = bx(cx), py = by(cy);
+                ctx.strokeStyle = 'rgba(200, 200, 180, 0.5)';
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(px - w/2, py - h/2, w, h);
+                // Pin 1 dot
+                ctx.fillStyle = 'rgba(200, 200, 180, 0.5)';
+                ctx.beginPath();
+                ctx.arc(px - w/2 + 12, py - h/2 + 12, 4, 0, Math.PI * 2);
+                ctx.fill();
+                // Label
+                ctx.fillStyle = 'rgba(200, 200, 180, 0.45)';
+                ctx.font = '600 14px "Chakra Petch", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(label, px, py);
+            }
+
+            // Power traces (thick)
+            drawTrace([[-4.9, 3.0], [4.9, 3.0]], 8);
+            drawTrace([[-4.9, -3.0], [4.9, -3.0]], 8);
+
+            // Signal traces from main IC
+            drawTrace([[0.7, 0.3], [1.6, 0.3], [1.6, 0], [3.2, 0], [3.2, -0.8], [4.6, -0.8]], 3);
+            drawTrace([[0.7, 0], [2.1, 0], [2.1, 1.3], [2.8, 1.3]], 3);
+            drawTrace([[-4.9, 0], [-3.2, 0], [-3.2, -0.5], [-1.2, -0.5], [-0.7, -0.5]], 3);
+            drawTrace([[0, 0.7], [0, 1.6], [-0.5, 1.6], [-0.5, 3.0]], 4);
+            drawTrace([[0, -0.7], [0, -1.6], [0.5, -1.6], [0.5, -3.0]], 4);
+            drawTrace([[0.7, -0.3], [1.9, -0.3], [1.9, -1.6], [4.6, -1.6]], 3);
+            drawTrace([[1.5, -0.5], [0.9, -0.5], [0.9, -0.2], [0.7, -0.2]], 2.5);
+            drawTrace([[-0.8, 0.8], [-0.8, 0.5], [-0.5, 0.5]], 2.5);
+            drawTrace([[-2.2, 0.8], [-1.2, 0.8], [-1.2, 2.6]], 3);
+            drawTrace([[-4.9, 0.3], [-4.1, 0.3], [-4.1, 1.6], [-3.2, 1.6], [-3.2, 3.0]], 5);
+            drawTrace([[-0.7, 0.2], [-2.2, 0.2], [-2.2, 1.1], [-3.6, 1.1]], 2.5);
+            drawTrace([[0.7, 0.1], [2.5, 0.1], [2.5, -0.5], [3.5, -0.5], [3.5, -1.2], [4.6, -1.2]], 2.5);
+
+            // Bus traces (parallel group)
+            for (let i = 0; i < 4; i++) {
+                drawTrace([[0.7, -0.1 - i*0.12], [1.4 + i*0.12, -0.1 - i*0.12], [1.4 + i*0.12, -2.2 - i*0.12], [4.6, -2.2 - i*0.12]], 1.5);
+            }
+
+            // Additional traces for density
+            drawTrace([[-3.8, -1.5], [-2.5, -1.5], [-2.5, -0.8], [-0.7, -0.8]], 2.5);
+            drawTrace([[3.0, 2.0], [3.0, 1.5], [3.5, 1.5]], 2.5);
+            drawTrace([[-1.5, -2.0], [-1.5, -3.0]], 3);
+            drawTrace([[2.0, 2.5], [2.0, 3.0]], 3);
+            drawTrace([[-3.5, 2.0], [-3.5, 1.6], [-2.8, 1.6]], 2.5);
+
+            // IC footprints
+            drawICOutline(0, 0, 130, 130, 'SD2025');
+            drawICOutline(3.2, 1.5, 80, 45, 'LM358');
+
+            // IC pads
+            const icPins = 8;
+            for (let i = 0; i < icPins; i++) {
+                const offset = (i - (icPins-1)/2) * 14;
+                drawSMDPads(-0.325, 0 + offset/S, 14, 7, 130 - 28);
+                drawSMDPads(0.325, 0 + offset/S, 14, 7, 130 - 28);
+            }
+            for (let i = 0; i < icPins; i++) {
+                const offset = (i - (icPins-1)/2) * 14;
+                ctx.fillStyle = '#c89548';
+                ctx.fillRect(bx(0) - 65 + i * 14 + 7, by(0) - 65 - 14, 7, 14);
+                ctx.fillRect(bx(0) - 65 + i * 14 + 7, by(0) + 65, 7, 14);
+            }
+
+            // Small IC pads
+            for (let i = 0; i < 4; i++) {
+                const offset = (i - 1.5) * 12;
+                drawSMDPads(3.2, 1.5 + offset/S, 10, 6, 80 - 20);
+            }
+
+            // SMD component pads
+            const smdPositions = [
+                [0.9, 0.9], [-0.9, 0.9], [0.9, -0.9], [-0.9, -0.9],
+                [-2.5, 1.5], [-3.2, -0.5], [3.5, 1.5], [2.0, -2.0],
+                [2.5, -2.0], [3.0, -2.0], [-2.0, -1.5]
+            ];
+            smdPositions.forEach(p => drawSMDPads(p[0], p[1], 10, 8, 16));
+
+            // Through-hole pads (pin header on right edge)
+            for (let i = -4; i <= 4; i++) {
+                drawPad(4.6, i * 0.28, 7, i === -4);
+            }
+
+            // Vias
+            const viaPositions = [
+                [-0.5, 2.0], [0.5, -2.0], [-2.0, 1.0], [1.5, 1.0],
+                [3.0, -0.5], [-3.5, -1.0], [1.0, 2.5], [-1.0, -2.5],
+                [4.0, 0.5], [-4.0, 0.5], [2.5, 2.5], [-2.5, -2.5],
+                [0, 2.5], [0, -2.5], [3.5, -2.5], [-3.5, 2.5]
+            ];
+            viaPositions.forEach(v => drawVia(v[0], v[1]));
+
+            // Mounting holes (corners)
+            [[4.5, 3.1], [-4.5, 3.1], [4.5, -3.1], [-4.5, -3.1]].forEach(m => {
+                ctx.fillStyle = '#0a3d0a';
+                ctx.beginPath();
+                ctx.arc(bx(m[0]), by(m[1]), 18, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#c89548';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(bx(m[0]), by(m[1]), 18, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.fillStyle = '#222';
+                ctx.beginPath();
+                ctx.arc(bx(m[0]), by(m[1]), 10, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Silkscreen text
+            ctx.fillStyle = 'rgba(200, 200, 180, 0.35)';
+            ctx.font = '600 18px "Chakra Petch", sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('SD-PORTFOLIO  REV 1.0', bx(-4.3), by(-3.35));
+            ctx.font = '400 11px "Azeret Mono", monospace';
+            ctx.fillText('NIRMA UNIV. 2025', bx(-4.3), by(-3.5));
+            ctx.textAlign = 'right';
+            ctx.fillText('ECE DEPT.', bx(4.3), by(-3.5));
+
+            // Component reference designators
+            ctx.fillStyle = 'rgba(200, 200, 180, 0.3)';
+            ctx.font = '500 9px "Azeret Mono", monospace';
+            ctx.textAlign = 'center';
+            const refs = [
+                [0.9, 1.15, 'C3'], [-0.9, 1.15, 'C4'], [0.9, -1.15, 'C5'], [-0.9, -1.15, 'C6'],
+                [-2.5, 1.8, 'C1'], [-3.2, -0.2, 'C2'], [1.5, -0.75, 'Y1'],
+                [2.0, -1.75, 'R1'], [2.5, -1.75, 'R2'], [3.0, -1.75, 'R3'],
+                [-1.2, 2.85, 'D1'], [-0.6, 2.85, 'D2'],
+                [4.6, 1.6, 'J1'], [-4.85, 0.4, 'J2']
+            ];
+            refs.forEach(r => ctx.fillText(r[2], bx(r[0]), by(r[1])));
+
+            return new THREE.CanvasTexture(c);
+        }
+
+        /* ── THREE.JS SCENE ── */
+        const canvas = document.getElementById('pcb-canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(canvas.parentElement.offsetWidth, canvas.parentElement.offsetHeight);
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.1;
+
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x040a04, 0.06);
+
+        const camera = new THREE.PerspectiveCamera(38, canvas.parentElement.offsetWidth / canvas.parentElement.offsetHeight, 0.1, 100);
+        camera.position.set(0, 7.5, 7);
+        camera.lookAt(0, 0, 0);
+
+        // Board group (rotates with mouse)
+        const boardGroup = new THREE.Group();
+        boardGroup.rotation.x = -0.25;
+        scene.add(boardGroup);
+
+        // ── Board mesh ──
+        const pcbTexture = createPCBTexture();
+        pcbTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        const boardGeo = new THREE.BoxGeometry(10, 0.12, 7);
+        const boardMats = [
+            new THREE.MeshStandardMaterial({ color: 0x0a3d0a, roughness: 0.7 }),
+            new THREE.MeshStandardMaterial({ color: 0x0a3d0a, roughness: 0.7 }),
+            new THREE.MeshStandardMaterial({ map: pcbTexture, roughness: 0.5, metalness: 0.15 }),
+            new THREE.MeshStandardMaterial({ color: 0x1a180a, roughness: 0.8 }),
+            new THREE.MeshStandardMaterial({ color: 0x0a3d0a, roughness: 0.7 }),
+            new THREE.MeshStandardMaterial({ color: 0x0a3d0a, roughness: 0.7 }),
+        ];
+        const board = new THREE.Mesh(boardGeo, boardMats);
+        boardGroup.add(board);
+
+        // ── 3D Components ──
+        const darkMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.4, metalness: 0.1 });
+        const pinMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, roughness: 0.3, metalness: 0.7 });
+        const capMat = new THREE.MeshStandardMaterial({ color: 0x1a1a3a, roughness: 0.5, metalness: 0.2 });
+        const resMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.6 });
+        const goldMat = new THREE.MeshStandardMaterial({ color: 0xc89548, roughness: 0.3, metalness: 0.6 });
+        const crystalMat = new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.2, metalness: 0.8 });
+
+        function addIC(x, z, w, h, d) {
+            const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), darkMat);
+            body.position.set(x, 0.06 + h/2, z);
+            boardGroup.add(body);
+            // Pins
+            const pinsPerSide = 8;
+            const pinGeo = new THREE.BoxGeometry(0.08, 0.015, 0.04);
+            for (let i = 0; i < pinsPerSide; i++) {
+                const offset = (i - (pinsPerSide-1)/2) * (d * 0.8 / pinsPerSide);
+                const pL = new THREE.Mesh(pinGeo, pinMat);
+                pL.position.set(x - w/2 - 0.04, 0.067, z + offset);
+                boardGroup.add(pL);
+                const pR = new THREE.Mesh(pinGeo, pinMat);
+                pR.position.set(x + w/2 + 0.04, 0.067, z + offset);
+                boardGroup.add(pR);
+            }
+            const pinGeoV = new THREE.BoxGeometry(0.04, 0.015, 0.08);
+            for (let i = 0; i < pinsPerSide; i++) {
+                const offset = (i - (pinsPerSide-1)/2) * (w * 0.8 / pinsPerSide);
+                const pT = new THREE.Mesh(pinGeoV, pinMat);
+                pT.position.set(x + offset, 0.067, z - d/2 - 0.04);
+                boardGroup.add(pT);
+                const pB = new THREE.Mesh(pinGeoV, pinMat);
+                pB.position.set(x + offset, 0.067, z + d/2 + 0.04);
+                boardGroup.add(pB);
+            }
+        }
+
+        addIC(0, 0, 0.65, 0.12, 0.65);    // Main IC
+        // Smaller IC
+        const soic = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.08, 0.2), darkMat);
+        soic.position.set(3.2, 0.1, -1.5);
+        boardGroup.add(soic);
+        for (let i = 0; i < 4; i++) {
+            const offset = (i - 1.5) * 0.06;
+            const p = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.01, 0.025), pinMat);
+            p.position.set(3.2 + offset, 0.065, -1.5 - 0.12);
+            boardGroup.add(p);
+            const p2 = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.01, 0.025), pinMat);
+            p2.position.set(3.2 + offset, 0.065, -1.5 + 0.12);
+            boardGroup.add(p2);
+        }
+
+        // Electrolytic capacitors
+        function addElecCap(x, z, r, h) {
+            const cyl = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 16), capMat);
+            cyl.position.set(x, 0.06 + h/2, z);
+            boardGroup.add(cyl);
+            const top = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.85, r * 0.85, 0.02, 16),
+                new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.3, metalness: 0.5 }));
+            top.position.set(x, 0.06 + h + 0.01, z);
+            boardGroup.add(top);
+        }
+        addElecCap(-2.5, -1.5, 0.18, 0.4);
+        addElecCap(-3.2, 0.5, 0.14, 0.32);
+
+        // SMD capacitors & resistors
+        const smdGeo = new THREE.BoxGeometry(0.12, 0.05, 0.07);
+        [
+            [0.9, -0.9], [-0.9, -0.9], [0.9, 0.9], [-0.9, 0.9],
+            [3.5, -1.5], [2.0, 2.0]
+        ].forEach(p => {
+            const m = new THREE.Mesh(smdGeo, new THREE.MeshStandardMaterial({ color: 0x8a7040, roughness: 0.5, metalness: 0.3 }));
+            m.position.set(p[0], 0.085, p[1]);
+            boardGroup.add(m);
+        });
+
+        [
+            [2.0, 2.0], [2.5, 2.0], [3.0, 2.0], [-2.0, 1.5]
+        ].forEach(p => {
+            const m = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.04, 0.06), resMat);
+            m.position.set(p[0], 0.08, p[1]);
+            boardGroup.add(m);
+        });
+
+        // Crystal oscillator
+        const crystal = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.08, 0.15), crystalMat);
+        crystal.position.set(1.5, 0.1, 0.5);
+        boardGroup.add(crystal);
+
+        // LEDs
+        const ledGeo = new THREE.SphereGeometry(0.06, 12, 8);
+        const led1Mat = new THREE.MeshStandardMaterial({ color: 0x00ff00, emissive: 0x00ff00, emissiveIntensity: 0.3, transparent: true, opacity: 0.8 });
+        const led2Mat = new THREE.MeshStandardMaterial({ color: 0xff3300, emissive: 0xff3300, emissiveIntensity: 0.2, transparent: true, opacity: 0.8 });
+        const led1 = new THREE.Mesh(ledGeo, led1Mat);
+        led1.position.set(-1.2, 0.12, -2.6);
+        boardGroup.add(led1);
+        const led2 = new THREE.Mesh(ledGeo, led2Mat);
+        led2.position.set(-0.6, 0.12, -2.6);
+        boardGroup.add(led2);
+
+        // Pin header
+        for (let i = -4; i <= 4; i++) {
+            const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.28, 6), goldMat);
+            pin.position.set(4.6, 0.06 + 0.14, -i * 0.28);
+            boardGroup.add(pin);
+        }
+
+        // USB connector
+        const usb = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.22, 0.6), crystalMat);
+        usb.position.set(-4.85, 0.06 + 0.11, 0);
+        boardGroup.add(usb);
+
+        // ── Lighting ──
+        scene.add(new THREE.AmbientLight(0x1a2a1a, 0.5));
+        const mainLight = new THREE.PointLight(0xffeedd, 0.9, 25);
+        mainLight.position.set(4, 10, 4);
+        scene.add(mainLight);
+        const accentLight = new THREE.PointLight(0xc87533, 0.35, 18);
+        accentLight.position.set(-5, 6, -3);
+        scene.add(accentLight);
+        const fillLight = new THREE.DirectionalLight(0x334433, 0.25);
+        fillLight.position.set(-2, 5, 5);
+        scene.add(fillLight);
+
+        // ── Particle System ──
+        const tracePaths3D = [
+            [[-4.9,0.15,0], [-3.2,0.15,0], [-3.2,0.15,0.5], [-1.2,0.15,0.5], [-0.7,0.15,0.5]],
+            [[0.7,0.15,-0.3], [1.6,0.15,-0.3], [1.6,0.15,0], [3.2,0.15,0], [3.2,0.15,0.8], [4.6,0.15,0.8]],
+            [[0,0.15,-0.7], [0,0.15,-1.6], [-0.5,0.15,-1.6], [-0.5,0.15,-3.0]],
+            [[0,0.15,0.7], [0,0.15,1.6], [0.5,0.15,1.6], [0.5,0.15,3.0]],
+            [[0.7,0.15,0], [2.1,0.15,0], [2.1,0.15,-1.3], [2.8,0.15,-1.3]],
+            [[-4.9,0.15,-0.3], [-4.1,0.15,-0.3], [-4.1,0.15,-1.6], [-3.2,0.15,-1.6], [-3.2,0.15,-3.0]],
+            [[-0.7,0.15,-0.2], [-2.2,0.15,-0.2], [-2.2,0.15,-1.1], [-3.6,0.15,-1.1]],
+            [[0.7,0.15,-0.1], [2.5,0.15,-0.1], [2.5,0.15,0.5], [3.5,0.15,0.5], [3.5,0.15,1.2], [4.6,0.15,1.2]],
+            [[-2.2,0.15,-0.8], [-1.2,0.15,-0.8], [-1.2,0.15,-2.6]],
+            [[1.5,0.15,0.5], [0.9,0.15,0.5], [0.9,0.15,0.2], [0.7,0.15,0.2]],
+        ];
+
+        const NUM_PARTICLES = 80;
+        const particlePositions = new Float32Array(NUM_PARTICLES * 3);
+        const particleData = [];
+
+        for (let i = 0; i < NUM_PARTICLES; i++) {
+            const pi = Math.floor(Math.random() * tracePaths3D.length);
+            particleData.push({
+                pathIndex: pi,
+                progress: Math.random(),
+                speed: 0.0008 + Math.random() * 0.002
+            });
+        }
+
+        // Glow texture
+        const glowC = document.createElement('canvas');
+        glowC.width = 32; glowC.height = 32;
+        const gCtx = glowC.getContext('2d');
+        const grad = gCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
+        grad.addColorStop(0, 'rgba(255, 200, 100, 1)');
+        grad.addColorStop(0.25, 'rgba(255, 150, 60, 0.7)');
+        grad.addColorStop(0.6, 'rgba(200, 117, 51, 0.2)');
+        grad.addColorStop(1, 'rgba(200, 117, 51, 0)');
+        gCtx.fillStyle = grad;
+        gCtx.fillRect(0, 0, 32, 32);
+
+        const particleGeo = new THREE.BufferGeometry();
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+        const particleMat = new THREE.PointsMaterial({
+            size: 0.18,
+            map: new THREE.CanvasTexture(glowC),
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            color: 0xffaa44
+        });
+        const particles = new THREE.Points(particleGeo, particleMat);
+        boardGroup.add(particles);
+
+        function getPointOnPath(path, t) {
+            const segs = path.length - 1;
+            const st = t * segs;
+            const si = Math.min(Math.floor(st), segs - 1);
+            const lt = st - si;
+            return [
+                path[si][0] + (path[si+1][0] - path[si][0]) * lt,
+                path[si][1] + (path[si+1][1] - path[si][1]) * lt,
+                path[si][2] + (path[si+1][2] - path[si][2]) * lt
+            ];
+        }
+
+        // ── Mouse tracking ──
+        let mouseX = 0, mouseY = 0;
+        let targetRotX = -0.25, targetRotY = 0;
+        document.addEventListener('mousemove', e => {
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+        });
+        document.addEventListener('touchmove', e => {
+            const t = e.touches[0];
+            mouseX = (t.clientX / window.innerWidth) * 2 - 1;
+            mouseY = (t.clientY / window.innerHeight) * 2 - 1;
+        }, { passive: true });
+
+        // ── Resize ──
+        function onResize() {
+            const w = canvas.parentElement.offsetWidth;
+            const h = canvas.parentElement.offsetHeight;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+        }
+        window.addEventListener('resize', onResize);
+
+        // ── Animation ──
+        let clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const dt = clock.getDelta();
+            const elapsed = clock.getElapsedTime();
+
+            // Mouse following
+            targetRotX = -0.25 + mouseY * 0.12;
+            targetRotY = mouseX * 0.18;
+            boardGroup.rotation.x += (targetRotX - boardGroup.rotation.x) * 0.04;
+            boardGroup.rotation.y += (targetRotY - boardGroup.rotation.y) * 0.04;
+
+            // Subtle hover
+            boardGroup.position.y = Math.sin(elapsed * 0.6) * 0.08;
+
+            // LED pulse
+            led1Mat.emissiveIntensity = 0.3 + Math.sin(elapsed * 3) * 0.15;
+            led2Mat.emissiveIntensity = 0.2 + Math.sin(elapsed * 2.3 + 1) * 0.1;
+
+            // Update particles
+            for (let i = 0; i < NUM_PARTICLES; i++) {
+                const pd = particleData[i];
+                pd.progress += pd.speed;
+                if (pd.progress >= 1) pd.progress -= 1;
+                const pos = getPointOnPath(tracePaths3D[pd.pathIndex], pd.progress);
+                particlePositions[i*3] = pos[0];
+                particlePositions[i*3+1] = pos[1];
+                particlePositions[i*3+2] = pos[2];
+            }
+            particleGeo.attributes.position.needsUpdate = true;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        /* ── SCROLL ANIMATIONS ── */
+        const revealEls = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+        revealEls.forEach(el => observer.observe(el));
+
+        /* ── NAV ── */
+        const nav = document.getElementById('mainNav');
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-links a');
+
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 60);
+
+            let current = '';
+            sections.forEach(sec => {
+                if (window.scrollY >= sec.offsetTop - 200) current = sec.id;
+            });
+            navLinks.forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+            });
+        });
+
+        // Smooth nav link click (close mobile menu)
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.remove('open');
+            });
+        });
+    })();
+    </script>
+</body>
+</html>
